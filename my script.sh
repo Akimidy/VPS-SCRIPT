@@ -57,6 +57,77 @@ fi
 chmod 600 /etc/dnstt/server.key
 chmod 644 /etc/dnstt/server.pub
 
+# Connection logger service with colors
+echo "==> Creating connection logger..."
+cat >/usr/local/bin/dnstt-connection-logger.py <<'EOF'
+#!/usr/bin/env python3
+import socket
+import threading
+import time
+from datetime import datetime
+
+LOG_FILE = "/var/log/dnstt-connections.log"
+LISTEN_HOST = "127.0.0.1"
+LISTEN_PORT = 22
+
+# Color codes
+GREEN = "\033[92m"
+BLUE = "\033[94m"
+YELLOW = "\033[93m"
+RED = "\033[91m"
+MAGENTA = "\033[95m"
+CYAN = "\033[96m"
+RESET = "\033[0m"
+BOLD = "\033[1m"
+
+# Welcome message with colors - AKIMIDY THE MYSTERY
+SERVER_MESSAGE = f"{BOLD}{MAGENTA}{'='*70}{RESET}\n{BOLD}{CYAN}AKIMIDY THE MYSTERY{RESET}\n{BOLD}{MAGENTA}{'='*70}{RESET}\n{BOLD}{GREEN}✓ Connection Established{RESET}\n{BLUE}Welcome to the server{RESET}\n\n{BOLD}{YELLOW}NOTE:{RESET}\n{CYAN}This server is good for social media, light download{RESET}\n{CYAN}but the speed may vary sometimes.{RESET}\n\n{BOLD}{MAGENTA}{'='*70}{RESET}"
+
+def log_connection(client_addr):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_entry = f"[{timestamp}] Connection from {client_addr}\n"
+    try:
+        with open(LOG_FILE, 'a') as f:
+            f.write(log_entry)
+        print(f"{GREEN}[+]{RESET} {log_entry.strip()}")
+    except Exception as e:
+        print(f"{RED}[-] Error logging connection: {e}{RESET}")
+
+def handle_client(client_socket, client_addr):
+    try:
+        log_connection(client_addr)
+        # Send welcome message
+        client_socket.sendall((SERVER_MESSAGE + "\n").encode())
+        # Keep connection open briefly
+        time.sleep(1)
+    except Exception as e:
+        print(f"{RED}[-] Error handling connection: {e}{RESET}")
+    finally:
+        client_socket.close()
+
+def start_logger():
+    try:
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server.bind((LISTEN_HOST, LISTEN_PORT))
+        server.listen(5)
+        print(f"{GREEN}[+] Connection logger started on {LISTEN_HOST}:{LISTEN_PORT}{RESET}")
+        
+        while True:
+            try:
+                client, addr = server.accept()
+                threading.Thread(target=handle_client, args=(client, addr), daemon=True).start()
+            except Exception as e:
+                print(f"{RED}[-] Accept error: {e}{RESET}")
+    except Exception as e:
+        print(f"{RED}[-] Logger error: {e}{RESET}")
+
+if __name__ == "__main__":
+    start_logger()
+EOF
+
+chmod +x /usr/local/bin/dnstt-connection-logger.py
+
 # DNSTT service
 echo "==> Creating dnstt-amokhan.service..."
 cat >/etc/systemd/system/dnstt-amokhan.service <<EOF
@@ -161,6 +232,23 @@ RestartSec=1
 WantedBy=multi-user.target
 EOF
 
+# Connection logger service
+echo "==> Creating connection logger service..."
+cat >/etc/systemd/system/dnstt-amokhan-logger.service <<EOF
+[Unit]
+Description=AMOKHAN DNSTT Connection Logger
+After=network-online.target dnstt-amokhan.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/bin/dnstt-connection-logger.py
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 # Firewall
 if command -v ufw >/dev/null 2>&1; then
   ufw allow 22/tcp || true
@@ -171,6 +259,7 @@ fi
 systemctl daemon-reload
 systemctl enable --now dnstt-amokhan.service
 systemctl enable --now dnstt-amokhan-proxy.service
+systemctl enable --now dnstt-amokhan-logger.service
 
 echo "======================================"
 echo " AMOKHAN DNSTT INSTALLED SUCCESSFULLY "
@@ -180,4 +269,6 @@ echo "DOMAIN  : ${TDOMAIN}"
 echo "MTU     : ${MTU}"
 echo "PUBKEY  :"
 cat /etc/dnstt/server.pub
+echo "======================================"
+echo "Connection logs: tail -f /var/log/dnstt-connections.log"
 echo "======================================"
