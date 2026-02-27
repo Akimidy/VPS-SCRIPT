@@ -4,7 +4,7 @@ set -euo pipefail
 # CONFIG (BADILISHA HAPA TU)
 ############################
 TDOMAIN="ns1.akimidy.store"   # 👈 BADILISHA DOMAIN HAPA
-MTU=1800
+MTU=1500
 DNSTT_PORT=5300
 DNS_PORT=53
 ############################
