@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Portfolio</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    line-height: 1.6;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background: #222;
+    color: white;
+    position: fixed;
+    width: 100%;
+    top: 0;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+}
+
+.nav-links li {
+    margin-left: 20px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+}
+
+/* HERO */
+.hero {
+    height: 100vh;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 60px;
+}
+
+.hero span {
+    color: yellow;
+}
+
+.hero button {
+    padding: 10px 20px;
+    margin-top: 20px;
+    border: none;
+    background: black;
+    color: white;
+    cursor: pointer;
+}
+
+/* SECTIONS */
+section {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+/* PROJECTS */
+.project-card {
+    background: #f4f4f4;
+    margin: 20px auto;
+    padding: 20px;
+    width: 300px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+}
+
+.project-card:hover {
+    transform: scale(1.05);
+}
+
+/* CONTACT */
+form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin: auto;
+}
+
+input, textarea {
+    margin: 10px 0;
+    padding: 10px;
+}
+
+button {
+    background: #333;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+/* FOOTER */
+footer {
+    background: #222;
+    color: white;
+    padding: 20px;
+}
+
+/* RESPONSIVE */
+@media(max-width: 768px) {
+    .nav-links {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<header>
+    <nav class="navbar">
+        <h2>MyPortfolio</h2>
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+</header>
+
+<!-- HERO -->
+<section id="home" class="hero">
+    <h1>Hello, I'm <span>John Doe</span></h1>
+    <p>Frontend Developer | Designer</p>
+    <button onclick="scrollToSection('projects')">View My Work</button>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+    <h2>About Me</h2>
+    <p>
+        I am a passionate web developer who builds modern, responsive websites using HTML, CSS, and JavaScript.
+    </p>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+    <h2>Projects</h2>
+
+    <div class="project-card">
+        <h3>Project 1</h3>
+        <p>Responsive Website</p>
+    </div>
+
+    <div class="project-card">
+        <h3>Project 2</h3>
+        <p>JavaScript App</p>
+    </div>
+
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+    <h2>Contact Me</h2>
+
+    <form id="contactForm">
+        <input type="text" placeholder="Your Name" required>
+        <input type="email" placeholder="Your Email" required>
+        <textarea placeholder="Your Message" required></textarea>
+        <button type="submit">Send</button>
+    </form>
+
+    <p id="formMessage"></p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <p>© 2026 My Portfolio</p>
+</footer>
+
+<script>
+// Smooth Scroll
+function scrollToSection(sectionId) {
+    document.getElementById(sectionId).scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
+// Contact Form
+const form = document.getElementById("contactForm");
+const message = document.getElementById("formMessage");
+
+form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    message.textContent = "Message sent successfully!";
+    message.style.color = "green";
+    form.reset();
+});
+
+// Navbar scroll effect
+window.addEventListener("scroll", () => {
+    const navbar = document.querySelector(".navbar");
+
+    if (window.scrollY > 50) {
+        navbar.style.background = "#000";
+    } else {
+        navbar.style.background = "#222";
+    }
+});
+</script>
+
+</body>
+</html>
